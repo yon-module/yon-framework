@@ -3,8 +3,8 @@ package server
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/yon-module/yon-framework/database"
+	"github.com/yon-module/yon-framework/logger"
 	"github.com/yon-module/yon-framework/middleware"
-	"log"
 )
 
 type Server struct {
@@ -12,15 +12,24 @@ type Server struct {
 }
 
 func NewServer() *Server {
+	logger.InitLogger()
+
 	r := gin.Default()
 	r.Use(middleware.CORSMiddleware())
+	r.Use(middleware.LoggerMiddleware())
 
 	server := &Server{Router: r}
 	return server
 }
 
 func (s *Server) Start(port string) {
-	database.InitDB()
-	log.Println("Server running on port", port)
+	s.initConfig()
+
+	logger.Log.Info().Msg("Gin server running use port " + port)
 	s.Router.Run(":" + port)
+}
+
+func (s *Server) initConfig() {
+	logger.Log.Info().Msg("Initial database")
+	database.InitDB()
 }
