@@ -4,6 +4,7 @@ import (
 	"os"
 
 	"github.com/gin-gonic/gin"
+	"github.com/joho/godotenv"
 	"github.com/yon-module/yon-framework/database"
 	"github.com/yon-module/yon-framework/logger"
 	"github.com/yon-module/yon-framework/middleware"
@@ -14,6 +15,7 @@ type Server struct {
 }
 
 func NewServer() *Server {
+	godotenv.Load()
 	logger.InitLogger()
 
 	r := gin.Default()
