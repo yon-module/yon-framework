@@ -2,8 +2,8 @@ package server
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/username/goframework/database"
-	"github.com/username/goframework/middleware"
+	"github.com/yon-module/yon-framework/database"
+	"github.com/yon-module/yon-framework/middleware"
 	"log"
 )
 
