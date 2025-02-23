@@ -18,15 +18,16 @@ echo "Project folder name: $FOLDER_NAME"
 read -p "Enter Package Name (default: $FOLDER_NAME): " PACKAGE_NAME
 PACKAGE_NAME=${PACKAGE_NAME:-$FOLDER_NAME}
 
-# **4. Run install Go packages**
-echo "Installing required Go packages..."
-go mod init $PACKAGE_NAME
-go get -u $DEFAULT_PACKAGE_FRAMEWORK
-
-# **5. Generate Folder Structure**
+# **4. Generate Folder Structure**
 echo "Creating project structure..."
 mkdir -p $FOLDER_NAME/src/{main/{controllers,model/{dto/{request,response},entity},repository,service,util,helper},tests}
 touch $FOLDER_NAME/main.go
+
+# **5. Run install Go packages**
+echo "Installing required Go packages..."
+cd $FOLDER_NAME
+go mod init $PACKAGE_NAME
+go get -u $DEFAULT_PACKAGE_FRAMEWORK
 
 # **6. Create .env.sample**
 cat <<EOL > $FOLDER_NAME/.env.sample

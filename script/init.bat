@@ -20,14 +20,7 @@ echo Project folder name: %FOLDER_NAME%
 set /p PACKAGE_NAME=Enter Package Name (default: %FOLDER_NAME%): 
 if "%PACKAGE_NAME%"=="" set PACKAGE_NAME=%FOLDER_NAME%
 
-:: **4. Run install Go packages**
-echo Installing required Go packages...
-cd %FOLDER_NAME%
-go mod init %PACKAGE_NAME%
-go get -u %DEFAULT_PACKAGE_FRAMEWORK%
-cd ..
-
-:: **5. Generate Folder Structure**
+:: **4. Generate Folder Structure**
 echo Creating project structure...
 mkdir %FOLDER_NAME%\src\main\controllers
 mkdir %FOLDER_NAME%\src\main\model\dto\request
@@ -39,6 +32,13 @@ mkdir %FOLDER_NAME%\src\main\util
 mkdir %FOLDER_NAME%\src\main\helper
 mkdir %FOLDER_NAME%\src\tests
 type nul > %FOLDER_NAME%\main.go
+
+:: **5. Run install Go packages**
+echo Installing required Go packages...
+cd %FOLDER_NAME%
+go mod init %PACKAGE_NAME%
+go get -u %DEFAULT_PACKAGE_FRAMEWORK%
+cd ..
 
 :: **6. Create .env.sample**
 echo Creating .env.sample file...
