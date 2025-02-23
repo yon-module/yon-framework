@@ -24,13 +24,8 @@ mkdir -p $FOLDER_NAME/src/{main/{controllers,model/{dto/{request,response},entit
 touch $FOLDER_NAME/.env.sample
 touch $FOLDER_NAME/main.go
 
-# **5. Run install Go packages**
-echo "Installing required Go packages..."
-cd $FOLDER_NAME
-go mod init $PACKAGE_NAME
-go get -u $DEFAULT_PACKAGE_FRAMEWORK
-
-# **6. Create .env.sample**
+# **5. Create .env.sample**
+echo "Setup env sample..."
 cat <<EOL > $FOLDER_NAME/.env.sample
 yon.server.appName=$PACKAGE_NAME
 yon.server.port=8080
@@ -42,6 +37,12 @@ yon.database.password=
 yon.database.port=
 yon.database.db=
 EOL
+
+# **6. Run install Go packages**
+echo "Installing required Go packages..."
+cd $FOLDER_NAME
+go mod init $PACKAGE_NAME
+go get -u $DEFAULT_PACKAGE_FRAMEWORK
 
 # Selesai
 echo "Project setup complete! 🎉"
