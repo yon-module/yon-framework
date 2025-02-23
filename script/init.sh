@@ -21,6 +21,7 @@ PACKAGE_NAME=${PACKAGE_NAME:-$FOLDER_NAME}
 # **4. Generate Folder Structure**
 echo "Creating project structure..."
 mkdir -p $FOLDER_NAME/src/{main/{controllers,model/{dto/{request,response},entity},repository,service,util,helper},tests}
+touch $FOLDER_NAME/.env.sample
 touch $FOLDER_NAME/main.go
 
 # **5. Run install Go packages**
