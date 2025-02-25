@@ -21,6 +21,10 @@ func NewServer() *Server {
 	_ = godotenv.Load()
 	logger.InitLogger()
 
+	if os.Getenv("yon.server.env") == "production" {
+		gin.SetMode(gin.ReleaseMode)
+	}
+
 	r := gin.Default()
 	r.Use(middleware.CORSMiddleware())
 	r.Use(middleware.LoggerMiddleware())
@@ -49,6 +53,8 @@ func NewServer() *Server {
 		contextPath = "/"
 	}
 
+	logger.Log.Info().Msg("Connect to Yon " + contextPath)
+
 	def := r.Group(contextPath)
 	def.GET("/ping", func(ctx *gin.Context) {
 		ctx.JSON(http.StatusOK, response.SuccessResponse("Success ping", os.Getenv("yon.server.appName")))
@@ -67,7 +73,7 @@ func (s *Server) Start() {
 		port = os.Getenv("yon.server.port")
 	}
 
-	logger.Log.Info().Msg("Gin server running use port " + port)
+	logger.Log.Info().Msg("Yon server running use port " + port)
 	_ = s.Router.Run(":" + port)
 }
 
