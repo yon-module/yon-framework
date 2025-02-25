@@ -10,9 +10,14 @@ import (
 )
 
 var db *gorm.DB
+var tableMigration []interface{}
+
+func MigrationRegister(tables ...interface{}) {
+	tableMigration = tables
+}
 
 func InitDB() {
-	logger.Log.Info().Msg("Connecting to database...")
+	logger.Log.Info().Msg("🏗️ Connecting to database...")
 	cfg := config.LoadConfig()
 	var err error
 
@@ -30,10 +35,14 @@ func InitDB() {
 	// Inisialisasi database
 	db, err = gorm.Open(cfg.DSN(), &gorm.Config{Logger: newLogger})
 	if err != nil {
-		logger.Log.Fatal().Err(err).Msg("Failed to connect to database")
+		logger.Log.Fatal().Err(err).Msg("❌ Failed to connect to database")
 	}
 
-	logger.Log.Info().Str("db", cfg.DBType).Msg("Database connected successfully")
+	logger.Log.Info().Msg("🚀 Running migration...")
+	_ = GetDB().AutoMigrate(tableMigration...)
+	logger.Log.Info().Msg("✅ Migration completed successfully!")
+
+	logger.Log.Info().Str("db", cfg.DBType).Msg("✅ Database connected successfully")
 }
 
 // GetDB returns the database instance
