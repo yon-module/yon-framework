@@ -18,13 +18,31 @@ type Server struct {
 }
 
 func NewServer() *Server {
-	godotenv.Load()
+	_ = godotenv.Load()
 	logger.InitLogger()
 
 	r := gin.Default()
 	r.Use(middleware.CORSMiddleware())
 	r.Use(middleware.LoggerMiddleware())
 	r.Use(middleware.RecoveryMiddleware())
+
+	r.NoMethod(func(context *gin.Context) {
+		context.JSON(http.StatusMethodNotAllowed, response.ErrorResponse(
+			response.MethodNotAllowed,
+			"Method not found "+context.Request.Method,
+			nil,
+		))
+		return
+	})
+
+	r.NoRoute(func(context *gin.Context) {
+		context.JSON(http.StatusNotFound, response.ErrorResponse(
+			response.NotFound,
+			"Route Not Found with method "+context.Request.Method,
+			nil,
+		))
+		return
+	})
 
 	contextPath := os.Getenv("yon.server.context.path")
 	if contextPath == "" {
@@ -36,6 +54,7 @@ func NewServer() *Server {
 		ctx.JSON(http.StatusOK, response.SuccessResponse("Success ping", os.Getenv("yon.server.appName")))
 	})
 
+	r.HandleMethodNotAllowed = true
 	server := &Server{Router: r, RouterGroup: def}
 	return server
 }
@@ -49,7 +68,7 @@ func (s *Server) Start() {
 	}
 
 	logger.Log.Info().Msg("Gin server running use port " + port)
-	s.Router.Run(":" + port)
+	_ = s.Router.Run(":" + port)
 }
 
 func (s *Server) initConfig() {
