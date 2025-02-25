@@ -29,7 +29,7 @@ func RecoveryMiddleware() gin.HandlerFunc {
 				logger.Log.Error().Any("Panic occurred: %v", err)
 
 				c.JSON(http.StatusInternalServerError, response.ErrorResponse(
-					response.ServerError, "Internal Server Error", nil,
+					response.ServerError, "Internal Server Error", err,
 				))
 
 				c.Abort()

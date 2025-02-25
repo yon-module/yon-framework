@@ -1,5 +1,7 @@
 package response
 
+import "os"
+
 type BaseResponse struct {
 	Status  string `json:"status"`
 	Code    int    `json:"code"`
@@ -18,6 +20,9 @@ func SuccessResponse(message string, data any) BaseResponse {
 }
 
 func ErrorResponse(code int, message string, errors any) BaseResponse {
+	if os.Getenv("yon.server.env") == "production" {
+		errors = nil
+	}
 	return BaseResponse{
 		Status:  "error",
 		Code:    code,
