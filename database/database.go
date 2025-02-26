@@ -13,7 +13,7 @@ var db *gorm.DB
 var tableMigration []interface{}
 
 func MigrationRegister(tables ...interface{}) {
-	tableMigration = tables
+	tableMigration = append(tableMigration, tables...)
 }
 
 func InitDB() {
