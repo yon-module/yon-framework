@@ -4,8 +4,6 @@ import (
 	"os"
 
 	"github.com/gin-gonic/gin"
-	"github.com/joho/godotenv"
-	"github.com/yon-module/yon-framework/database"
 	"github.com/yon-module/yon-framework/logger"
 	"github.com/yon-module/yon-framework/middleware"
 	"github.com/yon-module/yon-framework/server/response"
@@ -16,10 +14,10 @@ type Server struct {
 	RouterGroup *gin.RouterGroup
 }
 
-func NewServer() *Server {
-	_ = godotenv.Load()
-	logger.InitLogger()
+var routes []func(gr *gin.RouterGroup)
 
+func NewServer() *Server {
+	logger.Log.Info().Msg("Starting yon server...")
 	if os.Getenv("yon.server.env") == "production" {
 		gin.SetMode(gin.ReleaseMode)
 	}
@@ -59,13 +57,16 @@ func NewServer() *Server {
 		response.SuccessResponse("Success ping", os.Getenv("yon.server.appName")).Json(ctx)
 	})
 
+	for _, v := range routes {
+		v(def)
+	}
+
 	r.HandleMethodNotAllowed = true
 	server := &Server{Router: r, RouterGroup: def}
 	return server
 }
 
 func (s *Server) Start() {
-	s.initConfig()
 
 	port := "8080"
 	if os.Getenv("yon.server.port") != "" {
@@ -76,7 +77,10 @@ func (s *Server) Start() {
 	_ = s.Router.Run(":" + port)
 }
 
-func (s *Server) initConfig() {
-	logger.Log.Info().Msg("Initial database")
-	database.InitDB()
+func AddRoute(handler func(gr *gin.RouterGroup)) {
+	routes = append(routes, handler)
+}
+
+func AddRoutes(handlers ...func(gr *gin.RouterGroup)) {
+	routes = append(routes, handlers...)
 }
