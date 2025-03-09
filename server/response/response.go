@@ -1,6 +1,10 @@
 package response
 
-import "os"
+import (
+	"os"
+
+	"github.com/gin-gonic/gin"
+)
 
 type BaseResponse struct {
 	Status  string `json:"status"`
@@ -34,8 +38,16 @@ func ErrorResponse(code int, message string, errors any) BaseResponse {
 func ValidationErrorResponse(errors any) BaseResponse {
 	return BaseResponse{
 		Status:  "fail",
-		Code:    ValidationErr,
+		Code:    UnprocessableEntity,
 		Message: "Validation failed",
 		Errors:  errors,
 	}
+}
+
+func (r BaseResponse) Json(ctx *gin.Context) {
+	ctx.JSON(getCustomCode(r.Code), r)
+}
+
+func (r BaseResponse) Build(ctx *gin.Context) {
+	r.Json(ctx)
 }

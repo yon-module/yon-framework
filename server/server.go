@@ -1,7 +1,6 @@
 package server
 
 import (
-	"net/http"
 	"os"
 
 	"github.com/gin-gonic/gin"
@@ -31,20 +30,20 @@ func NewServer() *Server {
 	r.Use(middleware.RecoveryMiddleware())
 
 	r.NoMethod(func(context *gin.Context) {
-		context.JSON(http.StatusMethodNotAllowed, response.ErrorResponse(
+		response.ErrorResponse(
 			response.MethodNotAllowed,
 			"Method not found "+context.Request.Method,
 			nil,
-		))
+		).Json(context)
 		return
 	})
 
 	r.NoRoute(func(context *gin.Context) {
-		context.JSON(http.StatusNotFound, response.ErrorResponse(
+		response.ErrorResponse(
 			response.NotFound,
 			"Route Not Found with method "+context.Request.Method,
 			nil,
-		))
+		).Json(context)
 		return
 	})
 
@@ -57,7 +56,7 @@ func NewServer() *Server {
 
 	def := r.Group(contextPath)
 	def.GET("/ping", func(ctx *gin.Context) {
-		ctx.JSON(http.StatusOK, response.SuccessResponse("Success ping", os.Getenv("yon.server.appName")))
+		response.SuccessResponse("Success ping", os.Getenv("yon.server.appName")).Json(ctx)
 	})
 
 	r.HandleMethodNotAllowed = true
