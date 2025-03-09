@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/yon-module/yon-framework/exception"
 	"github.com/yon-module/yon-framework/logger"
 	"github.com/yon-module/yon-framework/server/response"
 )
@@ -28,10 +29,7 @@ func RecoveryMiddleware() gin.HandlerFunc {
 			if err := recover(); err != nil {
 				logger.Log.Error().Any("Panic occurred: %v", err)
 
-				c.JSON(http.StatusInternalServerError, response.ErrorResponse(
-					response.ServerError, "Internal Server Error", err,
-				))
-
+				exception.ExceptionHandler(err).Json(c)
 				c.Abort()
 			}
 		}()
