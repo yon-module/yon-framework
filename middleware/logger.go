@@ -1,6 +1,7 @@
 package middleware
 
 import (
+	"os"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -13,7 +14,13 @@ func LoggerMiddleware() gin.HandlerFunc {
 
 		ctx.Next()
 
+		appName := os.Getenv("yon.server.appName")
+		if appName == "" {
+			appName = "yon-framework"
+		}
+
 		logger.Log.Info().
+			Str("appName", appName).
 			Str("method", ctx.Request.Method).
 			Str("path", ctx.Request.URL.Path).
 			Int("status", ctx.Writer.Status()).
