@@ -3,7 +3,6 @@ package database
 import (
 	"time"
 
-	"github.com/yon-module/yon-framework/config"
 	"github.com/yon-module/yon-framework/logger"
 	"gorm.io/gorm"
 	databaseLogger "gorm.io/gorm/logger"
@@ -18,7 +17,16 @@ func MigrationRegister(tables ...interface{}) {
 
 func InitDB() {
 	logger.Log.Info().Msg("🏗️ Connecting to database...")
-	cfg := config.LoadConfig()
+	cfg := LoadConfig()
+
+	logger.Log.Info().
+		Str("db", cfg.DBType).
+		Str("dbHost", cfg.DBHost).
+		Str("dbPort", cfg.DBPort).
+		Str("dbName", cfg.DBName).
+		Str("dbUser", cfg.DBUser).
+		Str("dbPassword", "xxxx").Msg("Trying...")
+
 	var err error
 
 	// Custom logger untuk GORM
@@ -38,11 +46,10 @@ func InitDB() {
 		logger.Log.Fatal().Err(err).Msg("❌ Failed to connect to database")
 	}
 
+	logger.Log.Info().Msg("✅ Database connected successfully")
 	logger.Log.Info().Msg("🚀 Running migration...")
 	_ = GetDB().AutoMigrate(tableMigration...)
 	logger.Log.Info().Msg("✅ Migration completed successfully!")
-
-	logger.Log.Info().Str("db", cfg.DBType).Msg("✅ Database connected successfully")
 }
 
 // GetDB returns the database instance
