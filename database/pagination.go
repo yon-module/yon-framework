@@ -88,7 +88,7 @@ func countRecords(db *gorm.DB, anyType interface{}, done chan bool, count *int64
 	done <- true
 }
 
-func FindAllPaging[T any](pageRequest pagination.Request[T], model *interface{}) *Paginator {
+func FindAllPaging[T any](pageRequest pagination.Request[T], model interface{}) *Paginator {
 	query := GetDB()
 	// Apply search filter (if any)
 	if pageRequest.Search.Key != "" && pageRequest.Search.Value != "" {
