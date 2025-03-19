@@ -1,8 +1,12 @@
 package database
 
 import (
+	"fmt"
 	"math"
+	"reflect"
+	"strings"
 
+	"github.com/yon-module/yon-framework/pagination"
 	"gorm.io/gorm"
 )
 
@@ -82,4 +86,47 @@ func Paging(p *Param, result interface{}) *Paginator {
 func countRecords(db *gorm.DB, anyType interface{}, done chan bool, count *int64) {
 	db.Model(anyType).Count(count)
 	done <- true
+}
+
+func FindAllPaging[T any](pageRequest pagination.Request[T], model *interface{}) *Paginator {
+	query := GetDB()
+	// Apply search filter (if any)
+	if pageRequest.Search.Key != "" && pageRequest.Search.Value != "" {
+		// Here, assume we're using dynamic column filtering based on the search key
+		query = query.Where(fmt.Sprintf("%s LIKE ?", pageRequest.Search.Key), "%"+pageRequest.Search.Value+"%")
+	}
+
+	// Apply filter (if any)
+	// You can extend this based on the `Filter` type if necessary, for now, let's assume it's a field to search
+	if pageRequest.Filter != nil {
+		// Apply the filter logic here based on your structure.
+		// Example: You can add more complex filtering logic here
+		// E.g., if Filter is a struct with specific fields like Name, Price, etc.
+		// Use reflection to dynamically check fields in Filter
+		filter := reflect.ValueOf(*pageRequest.Filter)
+
+		// Iterate over the fields in the filter struct
+		for i := 0; i < filter.NumField(); i++ {
+			field := filter.Type().Field(i)
+			fieldValue := filter.Field(i)
+
+			// Skip zero values (i.e., empty or zero-value fields)
+			if fieldValue.IsZero() {
+				continue
+			}
+
+			// Build dynamic where clause based on field name and value
+			columnName := strings.ToLower(field.Name) // Adjust to match the column name
+			query = query.Where(fmt.Sprintf("%s = ?", columnName), fieldValue.Interface())
+		}
+	}
+
+	pg := Paging(&Param{
+		DB:      query,
+		Page:    pageRequest.Page,
+		Limit:   pageRequest.Size,
+		ShowSQL: true,
+	}, &model)
+
+	return pg
 }
