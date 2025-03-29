@@ -11,11 +11,12 @@ import (
 )
 
 type Param struct {
-	DB      *gorm.DB
-	Page    int
-	Limit   int
-	OrderBy []string
-	ShowSQL bool
+	DB       *gorm.DB
+	Page     int
+	Limit    int
+	OrderBy  []string
+	Preloads []string
+	ShowSQL  bool
 }
 
 type Paginator struct {
@@ -41,6 +42,12 @@ func Paging(p *Param, result interface{}) *Paginator {
 	if len(p.OrderBy) > 0 {
 		for _, o := range p.OrderBy {
 			db = db.Order(o)
+		}
+	}
+
+	if len(p.Preloads) > 0 {
+		for _, preload := range p.Preloads {
+			db = db.Preload(preload)
 		}
 	}
 
