@@ -3,6 +3,7 @@ package database
 import (
 	"fmt"
 	"github.com/yon-module/yon-framework/exception"
+	"github.com/yon-module/yon-framework/logger"
 	"github.com/yon-module/yon-framework/pagination"
 	"github.com/yon-module/yon-framework/server/response"
 	"gorm.io/gorm"
@@ -29,6 +30,7 @@ func (p *Pagination[T]) SetModal(model interface{}) *Pagination[T] {
 }
 
 func (p *Pagination[T]) SetPreloads(preloads ...string) *Pagination[T] {
+	logger.Log.Debug().Msg(fmt.Sprintf("Set Preloads %v", preloads))
 	p.preloads = preloads
 	return p
 }
@@ -41,6 +43,7 @@ func (p *Pagination[T]) SetRequest(request *pagination.Request[T]) *Pagination[T
 func (p *Pagination[T]) FindAllPaging() *Paginator {
 	query := p.db
 
+	logger.Log.Debug().Msg(fmt.Sprintf("Preloads %v", p.preloads))
 	for _, preload := range p.preloads {
 		query = query.Preload(preload)
 	}
