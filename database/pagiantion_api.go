@@ -3,11 +3,10 @@ package database
 import (
 	"fmt"
 	"github.com/yon-module/yon-framework/exception"
+	"github.com/yon-module/yon-framework/logger"
 	"github.com/yon-module/yon-framework/pagination"
 	"github.com/yon-module/yon-framework/server/response"
 	"gorm.io/gorm"
-	"reflect"
-	"strings"
 )
 
 type Pagination[T any] struct {
@@ -55,25 +54,34 @@ func (p *Pagination[T]) FindAllPaging() *Paginator {
 	// Apply filter (if any)
 	// You can extend this based on the `Filter` type if necessary, for now, let's assume it's a field to search
 	if pageRequest.Filter != nil {
-		// Apply the filter logic here based on your structure.
-		// Example: You can add more complex filtering logic here
-		// E.g., if Filter is a struct with specific fields like Name, Price, etc.
-		// Use reflection to dynamically check fields in Filter
-		filter := reflect.ValueOf(*pageRequest.Filter)
+		if filterMap, ok := any(*pageRequest.Filter).(map[string]interface{}); ok {
+			for key, value := range filterMap {
+				if value == nil {
+					continue
+				}
 
-		// Iterate over the fields in the filter struct
-		for i := 0; i < filter.NumField(); i++ {
-			field := filter.Type().Field(i)
-			fieldValue := filter.Field(i)
+				switch v := value.(type) {
+				case string:
+					if v == "" {
+						continue
+					}
+					query = query.Where(fmt.Sprintf("%s = ?", key), v)
 
-			// Skip zero values (i.e., empty or zero-value fields)
-			if fieldValue.IsZero() {
-				continue
+				case float64:
+					query = query.Where(fmt.Sprintf("%s = ?", key), v)
+
+				case bool:
+					query = query.Where(fmt.Sprintf("%s = ?", key), v)
+
+				case []interface{}:
+					query = query.Where(fmt.Sprintf("%s IN ?", key), v)
+
+				default:
+					logger.Log.Warn().Str("key", key).Interface("value", value).Msg("Unhandled filter type")
+				}
 			}
-
-			// Build dynamic where clause based on field name and value
-			columnName := strings.ToLower(field.Name) // Adjust to match the column name
-			query = query.Where(fmt.Sprintf("%s = ?", columnName), fieldValue.Interface())
+		} else {
+			logger.Log.Warn().Msg("Filter is not a map[string]interface{}")
 		}
 	}
 
