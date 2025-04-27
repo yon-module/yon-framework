@@ -48,7 +48,7 @@ func (p *Pagination[T]) FindAllPaging() *Paginator {
 	// Apply search filter (if any)
 	if pageRequest.Search.Key != "" && pageRequest.Search.Value != "" {
 		// Here, assume we're using dynamic column filtering based on the search key
-		query = query.Where(fmt.Sprintf("%s LIKE ?", pageRequest.Search.Key), "%"+pageRequest.Search.Value+"%")
+		query = query.Where(fmt.Sprintf("lower(%s) LIKE lower(?)", pageRequest.Search.Key), "%"+pageRequest.Search.Value+"%")
 	}
 
 	// Apply filter (if any)
