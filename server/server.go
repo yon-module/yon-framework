@@ -1,12 +1,12 @@
 package server
 
 import (
-	"os"
-
 	"github.com/gin-gonic/gin"
 	"github.com/yon-module/yon-framework/logger"
 	"github.com/yon-module/yon-framework/middleware"
 	"github.com/yon-module/yon-framework/server/response"
+	"github.com/yon-module/yon-framework/yonevent"
+	"os"
 )
 
 type Server struct {
@@ -72,9 +72,12 @@ func (s *Server) Start() {
 	if os.Getenv("yon.server.port") != "" {
 		port = os.Getenv("yon.server.port")
 	}
-
-	logger.Log.Info().Msg("Yon server running use port " + port)
-	_ = s.Router.Run(":" + port)
+	go func() {
+		logger.Log.Info().Msg("Yon server running use port " + port)
+		if err := s.Router.Run(port); err != nil {
+			yonevent.Emit("serverready")
+		}
+	}()
 }
 
 func AddRoute(handler func(gr *gin.RouterGroup)) {
