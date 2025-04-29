@@ -74,7 +74,7 @@ func (s *Server) Start() {
 	}
 
 	logger.Log.Info().Msg("Yon server running use port " + port)
-	if err := s.Router.Run(port); err != nil {
+	if err := s.Router.Run(":" + port); err != nil {
 		yonevent.Emit("serverready")
 	}
 }
