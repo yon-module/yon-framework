@@ -72,12 +72,11 @@ func (s *Server) Start() {
 	if os.Getenv("yon.server.port") != "" {
 		port = os.Getenv("yon.server.port")
 	}
-	go func() {
-		logger.Log.Info().Msg("Yon server running use port " + port)
-		if err := s.Router.Run(port); err != nil {
-			yonevent.Emit("serverready")
-		}
-	}()
+
+	logger.Log.Info().Msg("Yon server running use port " + port)
+	if err := s.Router.Run(port); err != nil {
+		yonevent.Emit("serverready")
+	}
 }
 
 func AddRoute(handler func(gr *gin.RouterGroup)) {
