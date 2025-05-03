@@ -46,8 +46,10 @@ func ValidationErrorResponse(errors any) BaseResponse {
 
 func (r BaseResponse) Json(ctx *gin.Context) {
 	ctx.JSON(getCustomCode(r.Code), r)
+	ctx.Abort()
 }
 
 func (r BaseResponse) Build(ctx *gin.Context) {
 	r.Json(ctx)
+	ctx.Abort()
 }
