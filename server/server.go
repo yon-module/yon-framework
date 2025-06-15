@@ -23,6 +23,7 @@ func NewServer() *Server {
 	}
 
 	r := gin.Default()
+	r.Use(middleware.LoggerRequestMiddleware())
 	r.Use(middleware.CORSMiddleware())
 	r.Use(middleware.LoggerMiddleware())
 	r.Use(middleware.RecoveryMiddleware())
@@ -85,4 +86,8 @@ func AddRoute(handler func(gr *gin.RouterGroup)) {
 
 func AddRoutes(handlers ...func(gr *gin.RouterGroup)) {
 	routes = append(routes, handlers...)
+}
+
+func GetRequestId(ctx *gin.Context) string {
+	return ctx.GetString("requestid")
 }

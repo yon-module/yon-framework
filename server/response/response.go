@@ -7,11 +7,12 @@ import (
 )
 
 type BaseResponse struct {
-	Status  string `json:"status"`
-	Code    int    `json:"code"`
-	Message string `json:"message"`
-	Data    any    `json:"data,omitempty"`
-	Errors  any    `json:"errors,omitempty"`
+	Status    string `json:"status"`
+	RequestID string `json:"requestId"`
+	Code      int    `json:"code"`
+	Message   string `json:"message"`
+	Data      any    `json:"data,omitempty"`
+	Errors    any    `json:"errors,omitempty"`
 }
 
 func SuccessResponse(message string, data any) BaseResponse {
@@ -45,6 +46,7 @@ func ValidationErrorResponse(errors any) BaseResponse {
 }
 
 func (r BaseResponse) Json(ctx *gin.Context) {
+	r.RequestID = ctx.GetString("requestid")
 	ctx.JSON(getCustomCode(r.Code), r)
 	ctx.Abort()
 }
