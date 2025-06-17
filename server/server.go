@@ -23,6 +23,7 @@ func NewServer() *Server {
 	}
 
 	r := gin.Default()
+	initialLoggerSentry(r)
 	r.Use(middleware.LoggerRequestMiddleware())
 	r.Use(middleware.CORSMiddleware())
 	r.Use(middleware.LoggerMiddleware())
