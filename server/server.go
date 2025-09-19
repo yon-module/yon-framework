@@ -1,12 +1,14 @@
 package server
 
 import (
+	"os"
+	"time"
+
 	"github.com/gin-gonic/gin"
 	"github.com/yon-module/yon-framework/logger"
 	"github.com/yon-module/yon-framework/middleware"
 	"github.com/yon-module/yon-framework/server/response"
 	"github.com/yon-module/yon-framework/yonevent"
-	"os"
 )
 
 type Server struct {
@@ -26,6 +28,8 @@ func NewServer() *Server {
 	initialLoggerSentry(r)
 	r.Use(middleware.LoggerRequestMiddleware())
 	r.Use(middleware.CORSMiddleware())
+	r.Use(middleware.ValidateTimestamp(5 * time.Minute))
+	r.Use(middleware.Signature())
 	r.Use(middleware.LoggerMiddleware())
 	r.Use(middleware.RecoveryMiddleware())
 
