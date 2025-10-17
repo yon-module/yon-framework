@@ -6,6 +6,7 @@ import (
 	"crypto/sha256"
 	"encoding/hex"
 	"encoding/json"
+	"fmt"
 	"io"
 	"io/ioutil"
 	"os"
@@ -78,9 +79,11 @@ func Signature() gin.HandlerFunc {
 			timeStamp,
 		}, ":")
 
+		fmt.Println(signData)
 		mac := hmac.New(sha256.New, []byte(clientSecretEnv))
 		mac.Write([]byte(signData))
 		expectedSig := hex.EncodeToString(mac.Sum(nil))
+		fmt.Println(expectedSig)
 
 		if !hmac.Equal([]byte(expectedSig), []byte(signature)) {
 			response.ErrorResponse(response.Unauthorized, "Invalid signature", nil).Json(c)
