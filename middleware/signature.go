@@ -84,8 +84,7 @@ func Signature() gin.HandlerFunc {
 		fmt.Println(signData)
 		mac := hmac.New(sha512.New, []byte(clientSecretEnv))
 		mac.Write([]byte(signData))
-		fmt.Println(mac.Sum(nil), hex.EncodeToString(mac.Sum(nil)))
-		expectedSig := base64.StdEncoding.EncodeToString([]byte(hex.EncodeToString(mac.Sum(nil))))
+		expectedSig := base64.StdEncoding.EncodeToString(mac.Sum(nil))
 		fmt.Println(expectedSig)
 
 		if !hmac.Equal([]byte(expectedSig), []byte(signature)) {
