@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"crypto/hmac"
 	"crypto/sha256"
+	"encoding/base64"
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
@@ -82,7 +83,7 @@ func Signature() gin.HandlerFunc {
 		fmt.Println(signData)
 		mac := hmac.New(sha256.New, []byte(clientSecretEnv))
 		mac.Write([]byte(signData))
-		expectedSig := hex.EncodeToString(mac.Sum(nil))
+		expectedSig := base64.StdEncoding.EncodeToString([]byte(hex.EncodeToString(mac.Sum(nil))))
 		fmt.Println(expectedSig)
 
 		if !hmac.Equal([]byte(expectedSig), []byte(signature)) {
@@ -111,5 +112,5 @@ func minifySha256Body(bodyBytes []byte) string {
 		}
 	}
 	sum := sha256.Sum256(minified)
-	return hex.EncodeToString(sum[:])
+	return strings.ToLower(hex.EncodeToString(sum[:]))
 }
